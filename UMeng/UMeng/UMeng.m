@@ -61,17 +61,18 @@ FREObject getUDID(FREContext context, void* funcData, uint32_t argc, FREObject a
     return udid;
 }
 
-FREObject onEvent(FREContext context, void* funcData, uint32_t argc, FREObject argv[]){
+ANE_FUNCTION(onEvent){
     NSLog(@"Called onEvent Function");
-    const uint8_t* eventID;
-    const uint8_t* eventLabel;
+    NSString *eventIDString = getStringFromFREObject(argv[0]);
+    NSString *labelIDString = getStringFromFREObject(argv[1]);
     
-    FREGetObjectAsUTF8(argv[0], 0, &eventID);
-    FREGetObjectAsUTF8(argv[1], 0, &eventLabel);
-    
-    if(eventLabel != NULL)
+    if (labelIDString != NULL)
     {
-        [MobClick event:[NSString stringWithUTF8String:(const char *)eventID] label:[NSString stringWithUTF8String:(const char *)eventLabel]];
+        [MobClick event:eventIDString label:labelIDString];
+    }
+    else
+    {
+        [MobClick event:eventIDString];
     }
     
     NSLog(@"Called onEvent Function OK");
@@ -79,33 +80,78 @@ FREObject onEvent(FREContext context, void* funcData, uint32_t argc, FREObject a
     return nil;
 }
 
+ANE_FUNCTION(onEventBegin)
+{
+    NSString *eventIDString = getStringFromFREObject(argv[0]);
+    NSString *labelIDString = getStringFromFREObject(argv[1]);
+    
+    if (eventIDString != NULL)
+    {
+        [MobClick beginEvent:eventIDString label:labelIDString];
+    }
+    return nil;
+}
+
+ANE_FUNCTION(onEventEnd)
+{
+    NSString *eventIDString = getStringFromFREObject(argv[0]);
+    NSString *labelIDString = getStringFromFREObject(argv[1]);
+    
+    if (eventIDString != NULL)
+    {
+        [MobClick endEvent:eventIDString label:labelIDString];
+    }
+    return nil;
+}
+
+ANE_FUNCTION(onPageBegin)
+{
+    NSString *page = getStringFromFREObject(argv[0]);
+    
+    if (page != NULL)
+    {
+        [MobClick beginLogPageView:page];
+    }
+    return nil;
+}
+
+ANE_FUNCTION(onPageEnd)
+{
+    NSString *page = getStringFromFREObject(argv[0]);
+    
+    if (page != NULL)
+    {
+        [MobClick endLogPageView:page];
+    }
+    return nil;
+}
+
+NSString* getStringFromFREObject(FREObject obj)
+{
+    uint32_t length;
+    const uint8_t *value;
+    FREGetObjectAsUTF8(obj, &length, &value);
+    return [NSString stringWithUTF8String:(const char *)value];
+}
+
 void UMengContextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, uint32_t* numFunctionsToTest,
                              const FRENamedFunction** functionsToSet){
-    uint numOfFun = 5;
     
-    FRENamedFunction* func = (FRENamedFunction*) malloc(sizeof(FRENamedFunction) * numOfFun);
-    *numFunctionsToTest = numOfFun;
+    static FRENamedFunction func[] =
+    {
+        MAP_FUNCTION(startAnaly, NULL),
+        MAP_FUNCTION(onEvent, NULL),
+        MAP_FUNCTION(onEventBegin, NULL),
+        MAP_FUNCTION(onEventEnd, NULL),
+        MAP_FUNCTION(onPageBegin, NULL),
+        MAP_FUNCTION(onPageEnd, NULL),
+        MAP_FUNCTION(getUDID, NULL),
+        MAP_FUNCTION(onPause, NULL),
+        MAP_FUNCTION(onResume, NULL),
+        
+    };
     
-    func[0].name = (const uint8_t*) "startAnaly";
-    func[0].functionData = NULL;
-    func[0].function = &startAnaly;
-    
-    func[1].name = (const uint8_t*) "onEvent";
-    func[1].functionData = NULL;
-    func[1].function = &onEvent;
-    
-    func[2].name = (const uint8_t*) "getUDID";
-    func[2].functionData = NULL;
-    func[2].function = &getUDID;
-    
-    func[3].name = (const uint8_t*) "onPause";
-    func[3].functionData = NULL;
-    func[3].function = &onPause;
-    
-    func[4].name = (const uint8_t*) "onResume";
-    func[4].functionData = NULL;
-    func[4].function = &onResume;
-    
+    *numFunctionsToTest = sizeof(func) / sizeof(FRENamedFunction);
     *functionsToSet = func;
     
     NSLog(@"Inited");

@@ -1,0 +1,8 @@
+<platform xmlns="http://ns.adobe.com/air/extension/13.0">
+	<description>An optional description.</description>
+	<copyright>2011 (optional)</copyright>
+	<packagedDependencies>
+		<packagedDependency>umeng-analytics-v5.2.3.jar</packagedDependency>
+		<packagedDependency>android-support-v4.jar</packagedDependency>
+	</packagedDependencies>
+</platform>

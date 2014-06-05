@@ -59,21 +59,26 @@
 		<delete dir="../android/temp"/>
 		<mkdir dir="../android/temp/classes"/>
 
-		<javac source="1.6" srcdir="../${name}Andorid/src" destdir="../android/temp/classes" includeantruntime="false">
+		<javac source="1.6" srcdir="../${name}Andorid/src" destdir="../android/temp/classes" includeantruntime="false" encoding="utf-8">
 			<classpath>
 				<pathelement location="${android.sdk}/android.jar"/>
 				<pathelement location="${FLEX_HOME}/lib/android/FlashRuntimeExtensions.jar"/>
-				<pathelement location="../libs/umeng_sdk.jar"/>
+                <pathelement location="../UMengAndorid/libs/android-support-v4.jar"/>
+				<pathelement location="../libs/umeng-analytics-v5.2.3.jar"/>
 			</classpath>
 		</javac>
 
-		<mkdir dir="../android/temp/zip"/>
-		<unzip src="../libs/umeng_sdk.jar" dest="../android/temp/zip"/>
-		<copydir src="../android/temp/zip/com" dest="../android/temp/classes/com"/>
-
+		<!--<mkdir dir="../android/temp/zip"/>-->
+		<!--<copydir src="../android/temp/zip" dest="../android/temp/classes"/>-->
+        <!--<unzip src="../libs/umeng-analytics-v5.2.3.jar" dest="../android/temp/zip"/>-->
+        <!--<copydir src="../android/temp/zip/com" dest="../android/temp/classes/com"/>-->
+        <!--<copydir src="../android/temp/zip/u" dest="../android/temp/classes/u"/>-->
 		<mkdir dir="../temp/android/"/>
-		<jar basedir="../android/temp/classes" destfile="../temp/android/lib${name}.jar"/>
-		<delete dir="../android/temp"/>
+        <copy file="../UMengAndorid/bin/umanalytics.jar" tofile="../temp/android/lib${name}.jar" overwrite="true"/>
+        <copy file="../UMengAndorid/libs/android-support-v4.jar" todir="../temp/android/" overwrite="true"/>
+        <copy file="../libs/umeng-analytics-v5.2.3.jar" todir="../temp/android/" overwrite="true"/>
+		<!--<jar basedir="../android/temp/classes" destfile="../temp/android/lib${name}.jar"/>-->
+		<!--<delete dir="../android/temp"/>-->
 	</target>
 
 	<!-- Actionscript mobile -->
@@ -139,7 +144,7 @@
 			<arg line="-swc swc/${name}.swc"/>
 			<arg line="-platform iPhone-ARM -platformoptions ../build/platform.xml -C ios/ ."/>
 			<arg line="-platform iPhone-x86 -C ios-simulator/ ."/>
-			<arg line="-platform Android-ARM -C android/ ."/>
+			<arg line="-platform Android-ARM -platformoptions ../build/platform-android.xml -C android/ ."/>
 			<arg line="-platform default -C default/ ."/>
 		</exec>
 
